@@ -1,46 +1,50 @@
-# Case Machine Learning Engineer
+# Projeto de Previsão de Atrasos de Voos - Case Machine Learning Engineer
 
 
-# Escopo
+O projeto implementa um sistema completo de previsão de atrasos de voos, demonstrando competências em  desenvolvimento de API, gerenciamento de experimentos, orquestração de tarefas e análise exploratória de dados.
 
-Este teste consiste em criar uma solução de transformação de dados, treino de modelo e escoragem online. Para isso deverá ser entregue um **link de um repositório Git** (GitHub, BitBucket, etc.) contendo a seguinte estrutura:
+## Componentes Principais
 
+### API
 
+A API, construída com FastAPI, oferece endpoints para:
 
-* **/src/** - Códigos da API
-* **/notebook/** - Contém o arquivo notebook com as transformações do dado, respostas das perguntas e treinamento do modelo
-* **/docs/** - Desenho da arquitetura
-* **/tests/** - Testes unitários
+- Previsão de atrasos de voos
+- Carregamento de novos modelos
+- Obtenção de métricas do modelo atual
 
-Abaixo estão as regras/orientações para a entrega:
+### MLflow
 
+O MLflow é utilizado para o gerenciamento de experimentos de Machine Learning, rastreando parâmetros, métricas e artefatos dos modelos treinados.
 
+### Airflow
 
-* Você terá **15 dias corridos** a partir do recebimento deste email para fazer a entrega final via `Github`, em um repositório público e o link do repositório deverá ser enviado para a plataforma Gupy em resposta ao email de recebimento do desafio;
-* Durante todo o período o **time estará disponível** para dúvidas no email `data.mlops@picpay.com`;
-* O foco do teste é avaliar como você se sai em um desafio de rotinas de Engenheiro de Machine Learning bem como você lida ao aprender novas tecnologias;
-* Caso não consiga terminar 100% do proposto, recomendamos que faça as entregas mesmo assim para que o time possa avaliar seu desempenho;
-* O uso de ferramentas como **Google** e **ChatGPT** é permitido porém, iremos avaliar e questionar a solução entregue durante a entrevista técnica;
+O Apache Airflow orquestra o processo de treinamento e atualização do modelo. A DAG principal (`airport_model_training_dag.py`) é responsável por:
 
+1. Treinar modelos
+2. Registrar métricas no MLflow
+3. Atualizar o modelo na API
 
-## CheckList de Entrega
+### Análise Exploratória de Dados (EDA)
 
+O notebook Jupyter `notebooks/Case-MLOps.ipynb` contém a análise exploratória dos dados, incluindo:
 
+- Visualizações dos dados de voos
+- Análise de correlações entre variáveis
+- Insights sobre fatores que influenciam atrasos
 
-* A API deverá ser feita em **Python** e Conteinerizada no docker. A API deverá ter os seguintes endpoints:
-    * `/model/predict/`
-        * Endpoint onde deverá receber um payload com as informações do voo e retornar a previsão do atraso no destino
-    * `/model/load/`
-        * Endpoint onde deverá receber o arquivo .pkl do modelo e deixar a API pronta para realizar predições
-    * `/model/history/`
-        * Endpoint onde deverá exibir o histórico de predições realizadas (o payload de entrada + as saídas preditas)
-    * `/health/`
-        * Endpoint que irá retornar a saúde da API
-* O Notebook deverá ser exportado no formato **.ipynb **e estar dentro do repositório git.
-    * Deverá realizar as transformações utilizando spark:
-    * Responder o conjunto de perguntas contidas nesse documento
-* **Desenho** da arquitetura:
-    * Apresentar um desenho simples de como essa arquitetura poderia funcionar dentro de um ambiente Cloud;
-    * O desenho da arquitetura pode ser apenas uma **imagem** (.png, .jpg)
+## Arquitetura do Projeto
 
-**Você deverá apresentar a solução durante a entrevista técnica**
+O diagrama da arquitetura do projeto, disponível em `docs/case-diagram.png`, ilustra a interação entre os diferentes componentes do sistema, incluindo o fluxo de dados e a integração entre componentes da pipeline MLOps em ambiente AWS.
+
+## Tecnologias Utilizadas
+
+- FastAPI
+- MLflow
+- Apache Airflow
+- Scikit-learn
+- Pandas
+- Jupyter Notebook
+- Docker e Docker Compose
+
+Este projeto demonstra a implementação de um pipeline completo de MLOps, desde a análise exploratória de dados até a implantação e monitoramento contínuo de modelos de machine learning.

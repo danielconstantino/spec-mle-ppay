@@ -1,0 +1,6 @@
+apache-airflow
+joblib
+mlflow
+mlflow_skinny
+pandas
+scikit_learn

@@ -1,0 +1,38 @@
+# Use a imagem oficial do Airflow como base
+FROM apache/airflow:2.6.3
+
+# Mude para o usuário root para instalar dependências do sistema
+USER root
+
+# Instale dependências do sistema, se necessário
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        build-essential \
+        default-libmysqlclient-dev \
+        postgresql-client \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* \
+    && python -m pip install --upgrade pip
+
+# Copie o arquivo de requisitos para o container
+COPY ./requirements.txt /requirements.txt
+
+# Mude de volta para o usuário airflow
+USER airflow
+
+# Instale as dependências Python adicionais
+RUN pip install --no-cache-dir -r /requirements.txt
+
+# Configure o AIRFLOW_HOME
+ENV AIRFLOW_HOME=/opt/airflow
+
+# Copie o script de inicialização
+COPY init.sh /init.sh
+
+# Dê permissão de execução ao script
+USER root
+RUN chmod +x /init.sh
+USER airflow
+
+# O comando para inicializar o Airflow será fornecido no docker-compose.yml
+CMD ["/init.sh"]

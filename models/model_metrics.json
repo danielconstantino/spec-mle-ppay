@@ -1,0 +1,1 @@
+{"mse": 747.4467532126399, "rmse": 27.33947243844767, "mae": 15.584066387709528, "r2": 0.25223807689119104, "explained_variance": 0.2523006432335999, "regression_accuracy": 67.17095310136158, "regression_precision": 0.0, "training_time": 9.975515127182007, "avg_inference_time": 6.822594716220688e-05, "n_estimators": 100, "max_depth": 20}

@@ -1,36 +1,42 @@
 from fastapi import FastAPI
-from database import InMemoryDatabase
+from fastapi.middleware.cors import CORSMiddleware
+from src.routers import predict, model, health
+from src.config import settings
+from src.services.ml_model import ml_model
+import logging
 
-import uvicorn
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
+app = FastAPI(title="Case Machine Learning Engineer API")
 
-app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.ALLOWED_ORIGINS.split(","),
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
+app.include_router(predict.router, prefix="/model", tags=["predict"])
+app.include_router(model.router, prefix="/model", tags=["model"])
+app.include_router(health.router, tags=["health"])
 
-@app.get("/health", status_code=200, tags=["health"], summary="Health check")
-async def health():
-    return {"status": "ok"}
+@app.on_event("startup")
+async def startup_event():
+    logger.info("Iniciando a aplicação...")
+    if settings.CURRENT_MODEL_PATH:
+        try:
+            ml_model.load_initial_model()
+            logger.info(f"Modelo carregado automaticamente de {settings.CURRENT_MODEL_PATH}")
+        except Exception as e:
+            logger.error(f"Erro ao carregar o modelo na inicialização: {str(e)}")
 
-@app.post("/user/", tags=["example"], summary="Insert user")
-async def insert(data: dict):
-    db = InMemoryDatabase()
-    users = db.get_collection('users')
-    users.insert_one(data)
-    return {"status": "ok"}
-
-@app.get("/user/{name}", status_code=200, tags=["example"], summary="Get user by name")
-async def get(name: str):
-    db = InMemoryDatabase()
-    users = db.get_collection('users')
-    user = users.find_one({"name": name})
-    return {"status": "ok", "user": user}
-
-@app.get("/user/", tags=["example"], summary="List all users")
-async def list():
-    db = InMemoryDatabase()
-    users = db.get_collection('users')
-    return {"status": "ok", "users": [x for x in users.find({},{"_id": 0})]}
-
+@app.on_event("shutdown")
+async def shutdown_event():
+    logger.info("Encerrando a aplicação...")
+    # Adicione aqui qualquer limpeza necessária
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8080, log_level="debug")
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)

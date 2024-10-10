@@ -1,0 +1,32 @@
+# Use a imagem oficial do Airflow como base
+FROM apache/airflow:2.6.3
+
+# Mude para o usuário root para instalar dependências do sistema
+USER root
+
+# Instale dependências do sistema, se necessário
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        build-essential \
+        default-libmysqlclient-dev \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copie o arquivo de requisitos para o container
+COPY airports-database.csv /opt/airflow/airports-database.csv
+COPY ./requirements.txt /requirements.txt
+
+# Mude de volta para o usuário airflow
+USER airflow
+
+# Instale as dependências Python adicionais
+RUN pip install --no-cache-dir -r /requirements.txt
+
+# Configure o AIRFLOW_HOME
+ENV AIRFLOW_HOME=/opt/airflow
+
+# Exponha a porta do webserver
+EXPOSE 8080
+
+# O comando para iniciar o webserver será fornecido no docker-compose.yml
+CMD ["airflow", "webserver"]
